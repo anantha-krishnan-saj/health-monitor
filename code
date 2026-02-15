@@ -1,0 +1,45 @@
+
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
+
+TwoWire Wire(1); // I2C-1
+Adafruit_BMP085 bmp;
+
+#define BUZZER_PIN 0     // GPIO-0
+#define TEMP_LIMIT 28.0  // Temperature threshold (°C)
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);
+
+  if (!bmp.begin())
+  {
+    Serial.println("❌ BMP180 not detected!");
+    while (1);
+  }
+
+  Serial.println("✅ BMP180 Ready");
+}
+
+void loop()
+{
+  float temperature = bmp.readTemperature();
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  if (temperature > TEMP_LIMIT)
+  {
+    digitalWrite(BUZZER_PIN, HIGH);
+    Serial.println("🔥 ALERT: High Temperature!");
+  }
+  else
+  {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
+  delay(1000);
+}
